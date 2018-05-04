@@ -52,6 +52,7 @@ class ChatPanel : JPanel(), SocketListener {
         if (chatField.text == "" || toComboBox.selectedItem == null) return@ActionListener
         val content = chatField.text
         val to = toComboBox.selectedItem.toString()
+
         SocketManager.sendJson(JSONObject().put("command", "chat").put("content", content).put("to", to))
         chatField.text = ""
         chatArea.append("""
@@ -59,6 +60,7 @@ class ChatPanel : JPanel(), SocketListener {
             $content
 
             """.trimIndent())
+        scrollChatAreaToBottom()
     }
 
     val toComboBox = JComboBox<String>()
@@ -71,17 +73,7 @@ class ChatPanel : JPanel(), SocketListener {
         addActionListener(sendActionListener)
     }
 
-    val fileChooser = JFileChooser().apply {
-        //        fileFilter = object : FileFilter() {
-//            val acceptableExtensions = setOf("jpg", "jpeg", "png", "gif", "bmp")
-//            override fun accept(f: File): Boolean = f.extension in acceptableExtensions
-//
-//            val acceptableDescription = "图片文件(${acceptableExtensions.joinToString { "*.$it" }})"
-//            override fun getDescription(): String = acceptableDescription
-//
-//        }
-    }
-
+    val fileChooser = JFileChooser()
     val sendImageButton = JButton("发送文件").apply {
         addActionListener {
             if (fileChooser.showOpenDialog(this@ChatPanel) == JFileChooser.APPROVE_OPTION) {

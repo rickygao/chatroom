@@ -11,7 +11,7 @@ import kotlin.concurrent.thread
 
 object SocketManager {
 
-    private const val host = "localhost"
+    private const val host = "rickygao.xyz"
     private const val port = 6000
 
     lateinit var username: String
