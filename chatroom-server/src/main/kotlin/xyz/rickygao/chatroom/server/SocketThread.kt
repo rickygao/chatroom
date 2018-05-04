@@ -31,16 +31,19 @@ class SocketThread(
     override fun run() {
         printlnWithAddress("Connected")
         manager.add(this)
-        source.use { source ->
-            while (!source.exhausted())
-                onJsonReceive(source.readJson())
+        try {
+            source.use { source ->
+                while (!source.exhausted())
+                    onJsonReceive(source.readJson())
+            }
+        } finally {
+            manager.remove(this)
+            if (username != null) {
+                username = null
+                manager.broadcastOnlineUsernames()
+            }
+            printlnWithAddress("Disconnected")
         }
-        manager.remove(this)
-        if (username != null) {
-            username = null
-            manager.broadcastOnlineUsernames()
-        }
-        printlnWithAddress("Disconnected")
     }
 
     private fun onJsonReceive(json: JSONObject) {
