@@ -6,9 +6,11 @@ import java.awt.Dimension
 import java.awt.event.ActionListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.swing.*
 import kotlin.properties.Delegates
 
@@ -69,10 +71,36 @@ class ChatPanel : JPanel(), SocketListener {
         addActionListener(sendActionListener)
     }
 
+    val fileChooser = JFileChooser().apply {
+        //        fileFilter = object : FileFilter() {
+//            val acceptableExtensions = setOf("jpg", "jpeg", "png", "gif", "bmp")
+//            override fun accept(f: File): Boolean = f.extension in acceptableExtensions
+//
+//            val acceptableDescription = "图片文件(${acceptableExtensions.joinToString { "*.$it" }})"
+//            override fun getDescription(): String = acceptableDescription
+//
+//        }
+    }
+
+    val sendImageButton = JButton("发送文件").apply {
+        addActionListener {
+            if (fileChooser.showOpenDialog(this@ChatPanel) == JFileChooser.APPROVE_OPTION) {
+                if (toComboBox.selectedItem == null) return@addActionListener
+                val file = fileChooser.selectedFile
+                val content = Base64.getEncoder().encodeToString(file.readBytes())
+                val filename = file.name
+                val to = toComboBox.selectedItem.toString()
+
+                SocketManager.sendJson(JSONObject().put("command", "file").put("content", content).put("filename", filename).put("to", to))
+            }
+        }
+    }
+
     val sendBox = Box.createHorizontalBox().apply {
         add(toComboBox)
         add(chatField)
         add(sendButton)
+        add(sendImageButton)
     }.also {
         add(it, BorderLayout.SOUTH)
     }
@@ -142,6 +170,22 @@ class ChatPanel : JPanel(), SocketListener {
 
                         """.trimIndent())
                     scrollChatAreaToBottom()
+                }
+                "file" -> {
+                    val content = json.getString("content")
+                    val filename = json.getString("filename")
+                    val from = json.getString("from")
+                    val timestamp = json.getLong("timestamp")
+
+                    val extension = filename.substringAfterLast(".", "")
+                    val localFilename = UUID.randomUUID().toString() + if (extension != "") ".$extension" else ""
+                    chatArea.append("""
+                        $from 在 ${Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_DATE_TIME)} 给你发送了一个文件 $filename，将存储在 $localFilename
+
+                        """.trimIndent())
+                    scrollChatAreaToBottom()
+
+                    File(localFilename).writeBytes(Base64.getDecoder().decode(content))
                 }
                 "list-onlines" ->
                     onlines = json.getJSONArray("onlines").filterIsInstance<String>()

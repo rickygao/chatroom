@@ -87,15 +87,22 @@ class SocketThread(
                 val content = json.getString("content")
                 val to = json.getString("to")
 
-                if (Friend.check(username!!, to)) manager.send(JSONObject().put("command", "chat").put("message", "success").put("content", content).put("from", username).putTimestamp(), to)
-                else manager.send(JSONObject().put("command", "chat").put("message", "failed").put("to", to), username!!)
+                if (Friend.check(username!!, to)) manager.send(JSONObject().put("command", "chat").put("content", content).put("from", username).putTimestamp(), to)
+            }
+
+            "file" -> if (loggedIn) {
+                val content = json.getString("content")
+                val filename = json.getString("filename")
+                val to = json.getString("to")
+
+                if (Friend.check(username!!, to)) manager.send(JSONObject().put("command", "file").put("content", content).put("filename", filename).put("from", username).putTimestamp(), to)
             }
 
             "add" -> if (loggedIn) {
                 val content = json.getString("content")
                 val to = json.getString("to")
 
-                if (!Friend.check(username!!, to)) manager.send(JSONObject().put("command", "add").put("content", content).put("content", content).put("from", username), to)
+                if (!Friend.check(username!!, to)) manager.send(JSONObject().put("command", "add").put("content", content).put("from", username), to)
             }
 
             "confirm" -> if (loggedIn) {
