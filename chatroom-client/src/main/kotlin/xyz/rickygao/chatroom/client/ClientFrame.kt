@@ -10,10 +10,10 @@ val INSETS = Insets(PADDING, PADDING, PADDING, PADDING)
 
 class ClientFrame : JFrame(), SocketListener, LoginSucceedListener {
 
-    val functionPanel by lazy { ChatPanel() }
-    val welcomePanel by lazy { WelcomePanel() }
+    private val functionPanel by lazy { ChatPanel() }
+    private val welcomePanel by lazy { WelcomePanel() }
 
-    var content: Container
+    private var content: Container
         get() = contentPane
         set(value) {
             contentPane = value

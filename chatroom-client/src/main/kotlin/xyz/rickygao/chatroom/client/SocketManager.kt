@@ -11,19 +11,16 @@ import kotlin.concurrent.thread
 
 object SocketManager {
 
-    const val host = "rickygao.xyz"
-    const val port = 6000
+    private const val host = "localhost"
+    private const val port = 6000
 
     lateinit var username: String
 
-    lateinit var socket: Socket
-        private set
+    private lateinit var socket: Socket
 
-    lateinit var source: BufferedSource
-        private set
+    private lateinit var source: BufferedSource
 
-    lateinit var sink: BufferedSink
-        private set
+    private lateinit var sink: BufferedSink
 
     fun connect() {
         thread(isDaemon = true, name = "Socket-Thread") {
