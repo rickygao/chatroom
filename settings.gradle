@@ -1,0 +1,5 @@
+rootProject.name = 'chatroom'
+include 'chatroom-client'
+include 'chatroom-server'
+include 'chatroom-common'
+
